@@ -266,6 +266,42 @@ export default defineConfig({
 
 ---
 
+## Security
+
+### Authentication (Optional)
+
+Protect your xray endpoints with a shared secret:
+
+```ts
+// vite.config.ts
+import { xrayPlugin } from "xray-core/vite";
+
+export default {
+  plugins: [
+    xrayPlugin({
+      secret: process.env.XRAY_SECRET, // Optional: require authentication
+    }),
+  ],
+};
+```
+
+When a secret is configured, all requests must include it via header or query parameter:
+
+```bash
+# Via header
+curl -H "X-Xray-Secret: your-secret" localhost:5173/xray/state
+
+# Via query parameter
+curl "localhost:5173/xray/state?secret=your-secret"
+```
+
+### Additional Security
+
+- **Environment check**: xray endpoints are disabled in production (`NODE_ENV=production`) as a second defense layer
+- **Request body limits**: POST request bodies are limited to 1MB by default (configurable via `maxRequestBodySize`)
+
+---
+
 ## Development
 
 ```bash
@@ -277,6 +313,24 @@ npm run build
 
 # Build specific package
 npm run build -w packages/core
+
+# Lint all packages
+npm run lint
+
+# Lint and fix issues
+npm run lint:fix
+
+# Format code
+npm run format
+
+# Run tests
+npm run test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
 ```
 
 ---

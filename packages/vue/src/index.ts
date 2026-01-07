@@ -1,60 +1,56 @@
 // Vue bindings for xray
-export {
-  xrayVuePlugin,
-  getXrayCollector,
-  cleanupXray,
-  type XrayPluginOptions,
-} from "./plugin.js";
-
-export {
-  useXray,
-  useXrayCustom,
-  useXrayAction,
-  useXrayCollector,
-} from "./composables.js";
-
-// Re-export core types and utilities for convenience
-export {
-  createCollector,
-  getCollector,
-  setCollector,
-  setupInterceptors,
-  queryDom,
-  captureScreenshot,
-  getViewportInfo,
-  getPerformanceMetrics,
-  getStorageInfo,
-  getFocusInfo,
-  getAccessibilityInfo,
-  clickElement,
-  fillInput,
-  scrollTo,
-  navigate,
-  refresh,
-  goBack,
-  goForward,
-  registerAction,
-  unregisterAction,
-  getActions,
-  executeAction,
-} from "xray-core";
 
 export type {
-  XrayState,
-  XrayConfig,
-  XrayCollector,
-  XrayError,
-  XrayAction,
-  ConsoleEntry,
-  NetworkRequest,
-  RegisteredState,
   AssertionResult,
-  ViewportInfo,
-  PerformanceMetrics,
+  ConsoleEntry,
   DomQueryResult,
-  StorageInfo,
   FocusInfo,
-} from "xray-core";
-
-// Default export for plugin
-export { xrayVuePlugin as default } from "./plugin.js";
+  NetworkRequest,
+  PerformanceMetrics,
+  RegisteredState,
+  StorageInfo,
+  ViewportInfo,
+  XrayAction,
+  XrayCollector,
+  XrayConfig,
+  XrayError,
+  XrayState,
+} from 'xray-core'
+// Re-export core types and utilities for convenience
+export {
+  captureScreenshot,
+  clickElement,
+  createCollector,
+  executeAction,
+  fillInput,
+  getAccessibilityInfo,
+  getActions,
+  getCollector,
+  getFocusInfo,
+  getPerformanceMetrics,
+  getStorageInfo,
+  getViewportInfo,
+  goBack,
+  goForward,
+  navigate,
+  queryDom,
+  refresh,
+  registerAction,
+  scrollTo,
+  setCollector,
+  setupInterceptors,
+  unregisterAction,
+} from 'xray-core'
+export {
+  useXray,
+  useXrayAction,
+  useXrayCollector,
+  useXrayCustom,
+} from './composables.js'
+export {
+  cleanupXray,
+  getXrayCollector,
+  type XrayPluginOptions,
+  xrayVuePlugin,
+  xrayVuePlugin as default,
+} from './plugin.js'

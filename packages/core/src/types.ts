@@ -1,139 +1,147 @@
 export interface ConsoleEntry {
-  level: "log" | "warn" | "error" | "info" | "debug";
-  message: string;
-  timestamp: number;
+  level: 'log' | 'warn' | 'error' | 'info' | 'debug'
+  message: string
+  timestamp: number
 }
 
 export interface NetworkRequest {
-  id: string;
-  url: string;
-  method: string;
-  status: number | null;
-  duration: number | null;
-  timestamp: number;
-  error?: string;
+  id: string
+  url: string
+  method: string
+  status: number | null
+  duration: number | null
+  timestamp: number
+  error?: string
   // Headers (redacted by default)
-  requestHeaders?: Record<string, string>;
-  responseHeaders?: Record<string, string>;
+  requestHeaders?: Record<string, string>
+  responseHeaders?: Record<string, string>
   // Bodies (opt-in, JSON only, size-limited)
-  requestBody?: unknown;
-  responseBody?: unknown;
-  requestBodyTruncated?: boolean;
-  responseBodyTruncated?: boolean;
+  requestBody?: unknown
+  responseBody?: unknown
+  requestBodyTruncated?: boolean
+  responseBodyTruncated?: boolean
 }
 
 export interface XrayError {
-  message: string;
-  stack?: string;
-  timestamp: number;
-  componentStack?: string;
+  message: string
+  stack?: string
+  timestamp: number
+  componentStack?: string
 }
 
 export interface RegisteredState {
-  name: string;
-  state: unknown;
-  updatedAt: number;
+  name: string
+  state: unknown
+  updatedAt: number
 }
 
 export interface XrayState {
   // Metadata
-  timestamp: string;
-  url: string;
-  route: string;
-  title: string;
+  timestamp: string
+  url: string
+  route: string
+  title: string
 
   // Registered state (from useXray hooks)
-  registered: Record<string, RegisteredState>;
+  registered: Record<string, RegisteredState>
 
   // Automatic captures
-  errors: XrayError[];
-  warnings: string[];
-  console: ConsoleEntry[];
-  network: NetworkRequest[];
+  errors: XrayError[]
+  warnings: string[]
+  console: ConsoleEntry[]
+  network: NetworkRequest[]
 }
 
 export interface AssertionResult {
-  passed: boolean;
-  assertion: string;
-  details: Record<string, unknown>;
-  hint?: string;
+  passed: boolean
+  assertion: string
+  details: Record<string, unknown>
+  hint?: string
 }
 
 export interface XrayCollector {
-  getState(): XrayState;
-  registerState(name: string, state: unknown): void;
-  unregisterState(name: string): void;
-  addError(error: XrayError): void;
-  addConsole(entry: ConsoleEntry): void;
-  addNetwork(request: NetworkRequest): void;
-  updateNetwork(id: string, updates: Partial<NetworkRequest>): void;
-  clear(): void;
+  getState(): XrayState
+  registerState(name: string, state: unknown): void
+  unregisterState(name: string): void
+  addError(error: XrayError): void
+  addConsole(entry: ConsoleEntry): void
+  addNetwork(request: NetworkRequest): void
+  updateNetwork(id: string, updates: Partial<NetworkRequest>): void
+  clear(): void
 }
 
 export interface XrayAction {
-  name: string;
-  description?: string;
-  handler: (...args: unknown[]) => unknown | Promise<unknown>;
+  name: string
+  description?: string
+  handler: (...args: unknown[]) => unknown | Promise<unknown>
 }
 
 export interface ViewportInfo {
-  width: number;
-  height: number;
-  scrollX: number;
-  scrollY: number;
-  devicePixelRatio: number;
+  width: number
+  height: number
+  scrollX: number
+  scrollY: number
+  devicePixelRatio: number
 }
 
 export interface PerformanceMetrics {
   // Navigation timing
-  domContentLoaded: number | null;
-  loadComplete: number | null;
+  domContentLoaded: number | null
+  loadComplete: number | null
   // Memory (Chrome only)
-  usedJSHeapSize: number | null;
-  totalJSHeapSize: number | null;
+  usedJSHeapSize: number | null
+  totalJSHeapSize: number | null
   // React-specific (if available)
-  renderCount: number;
+  renderCount: number
 }
 
 export interface StorageInfo {
-  localStorage: Record<string, string>;
-  sessionStorage: Record<string, string>;
+  localStorage: Record<string, string>
+  sessionStorage: Record<string, string>
 }
 
 export interface FocusInfo {
-  activeElement: string | null;
-  activeElementId: string | null;
-  activeElementClasses: string[];
+  activeElement: string | null
+  activeElementId: string | null
+  activeElementClasses: string[]
 }
 
 export interface DomQueryResult {
-  found: boolean;
-  count: number;
-  html: string | null;
-  text: string | null;
-  attributes: Record<string, string> | null;
-  boundingRect: DOMRect | null;
-  visible: boolean;
-  computedStyles?: Record<string, string>;
+  found: boolean
+  count: number
+  html: string | null
+  text: string | null
+  attributes: Record<string, string> | null
+  boundingRect: DOMRect | null
+  visible: boolean
+  computedStyles?: Record<string, string>
 }
 
 export interface XrayConfig {
   /** Port for the HTTP API (default: 9876) */
-  port?: number;
+  port?: number
   /** Maximum console entries to keep (default: 100) */
-  maxConsoleEntries?: number;
+  maxConsoleEntries?: number
   /** Maximum network requests to keep (default: 50) */
-  maxNetworkEntries?: number;
+  maxNetworkEntries?: number
   /** Maximum errors to keep (default: 50) */
-  maxErrors?: number;
+  maxErrors?: number
   /** Capture request/response headers (default: true) */
-  captureHeaders?: boolean;
+  captureHeaders?: boolean
   /** Capture request/response bodies - JSON only (default: false) */
-  captureBodies?: boolean;
+  captureBodies?: boolean
   /** Maximum body size in bytes before truncation (default: 10240 = 10KB) */
-  maxBodySize?: number;
+  maxBodySize?: number
   /** Header names to redact (default: ['authorization', 'cookie', 'set-cookie', 'x-api-key']) */
-  redactHeaders?: string[];
+  redactHeaders?: string[]
   /** JSON field names to redact in bodies (default: ['password', 'token', 'secret', 'apiKey', 'api_key']) */
-  redactBodyFields?: string[];
+  redactBodyFields?: string[]
+  /**
+   * Shared secret for authenticating /xray/* endpoint requests.
+   * When set, all endpoints require either:
+   * - X-Xray-Secret header with matching value
+   * - ?secret= query parameter with matching value
+   * When not set (default), no authentication is required.
+   */
+  secret?: string
 }

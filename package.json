@@ -8,9 +8,18 @@
     "build": "npm run build --workspaces",
     "dev": "npm run dev --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces",
-    "clean": "rm -rf packages/*/dist"
+    "clean": "rm -rf packages/*/dist",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "typescript": "^5.3.0"
+    "@biomejs/biome": "^2.3.11",
+    "@vitest/coverage-v8": "^4.0.16",
+    "typescript": "^5.3.0",
+    "vitest": "^4.0.16"
   }
 }

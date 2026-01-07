@@ -1,23 +1,23 @@
-import type { Readable, Writable } from "svelte/store";
-import type { XrayConfig, XrayCollector } from "xray-core";
+import type { Readable, Writable } from 'svelte/store'
+import type { XrayCollector, XrayConfig } from 'xray-core'
 import {
   createCollector,
-  setCollector,
   getCollector,
-  setupInterceptors,
   registerAction,
+  setCollector,
+  setupInterceptors,
   unregisterAction,
-} from "xray-core";
+} from 'xray-core'
 
 // Import to ensure browser utilities are loaded and attached to window
-import "xray-core";
+import 'xray-core'
 
-let cleanup: (() => void) | null = null;
-let collector: XrayCollector | null = null;
+let cleanup: (() => void) | null = null
+let collector: XrayCollector | null = null
 
 export interface XrayOptions extends XrayConfig {
   /** Enable the inspector (default: true) */
-  enabled?: boolean;
+  enabled?: boolean
 }
 
 /**
@@ -37,34 +37,35 @@ export interface XrayOptions extends XrayConfig {
  * ```
  */
 export function initXray(options: XrayOptions = {}): () => void {
-  const { enabled = true, ...config } = options;
+  const { enabled = true, ...config } = options
 
-  if (!enabled) return () => {};
+  if (!enabled) return () => {}
 
   // Create collector
-  collector = createCollector(config);
-  setCollector(collector);
+  collector = createCollector(config)
+  setCollector(collector)
 
   // Set up interceptors (pass config for headers/body capture settings)
-  cleanup = setupInterceptors(collector, config);
+  cleanup = setupInterceptors(collector, config)
 
   // Expose collector to window for Vite plugin communication
-  if (typeof window !== "undefined") {
-    (window as unknown as Record<string, unknown>).__XRAY_COLLECTOR__ = collector;
-    (window as unknown as Record<string, unknown>).__XRAY_READY__ = true;
-    window.dispatchEvent(new CustomEvent("xray:ready"));
+  if (typeof window !== 'undefined') {
+    ;(window as unknown as Record<string, unknown>).__XRAY_COLLECTOR__ =
+      collector
+    ;(window as unknown as Record<string, unknown>).__XRAY_READY__ = true
+    window.dispatchEvent(new CustomEvent('xray:ready'))
   }
 
   // Return cleanup function
   return () => {
-    cleanup?.();
-    cleanup = null;
-    collector = null;
-    if (typeof window !== "undefined") {
-      (window as unknown as Record<string, unknown>).__XRAY_COLLECTOR__ = null;
-      (window as unknown as Record<string, unknown>).__XRAY_READY__ = false;
+    cleanup?.()
+    cleanup = null
+    collector = null
+    if (typeof window !== 'undefined') {
+      ;(window as unknown as Record<string, unknown>).__XRAY_COLLECTOR__ = null
+      ;(window as unknown as Record<string, unknown>).__XRAY_READY__ = false
     }
-  };
+  }
 }
 
 /**
@@ -90,19 +91,19 @@ export function initXray(options: XrayOptions = {}): () => void {
  */
 export function trackStore<T>(
   name: string,
-  store: Readable<T> | Writable<T>
+  store: Readable<T> | Writable<T>,
 ): () => void {
-  const collector = getCollector();
-  if (!collector) return () => {};
+  const collector = getCollector()
+  if (!collector) return () => {}
 
   const unsubscribe = store.subscribe((value) => {
-    collector.registerState(name, value);
-  });
+    collector.registerState(name, value)
+  })
 
   return () => {
-    unsubscribe();
-    collector.unregisterState(name);
-  };
+    unsubscribe()
+    collector.unregisterState(name)
+  }
 }
 
 /**
@@ -124,16 +125,16 @@ export function trackStore<T>(
  * ```
  */
 export function registerState(name: string, value: unknown): void {
-  const collector = getCollector();
-  collector?.registerState(name, value);
+  const collector = getCollector()
+  collector?.registerState(name, value)
 }
 
 /**
  * Unregister a previously registered state.
  */
 export function unregisterState(name: string): void {
-  const collector = getCollector();
-  collector?.unregisterState(name);
+  const collector = getCollector()
+  collector?.unregisterState(name)
 }
 
 /**
@@ -163,15 +164,15 @@ export function unregisterState(name: string): void {
 export function registerXrayAction(
   name: string,
   handler: (...args: unknown[]) => unknown | Promise<unknown>,
-  description?: string
+  description?: string,
 ): () => void {
-  registerAction({ name, handler, description });
-  return () => unregisterAction(name);
+  registerAction({ name, handler, description })
+  return () => unregisterAction(name)
 }
 
 /**
  * Get the xray collector instance.
  */
 export function getXrayCollector(): XrayCollector | null {
-  return getCollector();
+  return getCollector()
 }

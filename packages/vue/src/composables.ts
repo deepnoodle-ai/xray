@@ -1,6 +1,6 @@
-import { watch, onUnmounted, inject, type Ref, type WatchSource } from "vue";
-import type { XrayCollector } from "xray-core";
-import { getCollector, registerAction, unregisterAction } from "xray-core";
+import { inject, onUnmounted, type Ref, type WatchSource, watch } from 'vue'
+import type { XrayCollector } from 'xray-core'
+import { getCollector, registerAction, unregisterAction } from 'xray-core'
 
 /**
  * Register reactive state with xray for inspection.
@@ -27,24 +27,24 @@ import { getCollector, registerAction, unregisterAction } from "xray-core";
  */
 export function useXray(
   name: string,
-  state: Ref<unknown> | WatchSource<unknown> | (() => unknown)
+  state: Ref<unknown> | WatchSource<unknown> | (() => unknown),
 ): void {
-  const collector = getCollector();
-  if (!collector) return;
+  const collector = getCollector()
+  if (!collector) return
 
   // Watch the state and update on changes
   const stopWatch = watch(
     state as WatchSource<unknown>,
     (value) => {
-      collector.registerState(name, value);
+      collector.registerState(name, value)
     },
-    { immediate: true, deep: true }
-  );
+    { immediate: true, deep: true },
+  )
 
   onUnmounted(() => {
-    stopWatch();
-    collector.unregisterState(name);
-  });
+    stopWatch()
+    collector.unregisterState(name)
+  })
 }
 
 /**
@@ -53,9 +53,9 @@ export function useXray(
  */
 export function useXrayCustom(
   name: string,
-  state: Ref<unknown> | WatchSource<unknown> | (() => unknown)
+  state: Ref<unknown> | WatchSource<unknown> | (() => unknown),
 ): void {
-  useXray(name, state);
+  useXray(name, state)
 }
 
 /**
@@ -83,13 +83,13 @@ export function useXrayCustom(
 export function useXrayAction(
   name: string,
   handler: (...args: unknown[]) => unknown | Promise<unknown>,
-  description?: string
+  description?: string,
 ): void {
-  registerAction({ name, handler, description });
+  registerAction({ name, handler, description })
 
   onUnmounted(() => {
-    unregisterAction(name);
-  });
+    unregisterAction(name)
+  })
 }
 
 /**
@@ -97,6 +97,6 @@ export function useXrayAction(
  * Use this for advanced use cases where you need direct collector access.
  */
 export function useXrayCollector(): XrayCollector | null {
-  const injected = inject<XrayCollector | null>("xray-collector", null);
-  return injected ?? getCollector();
+  const injected = inject<XrayCollector | null>('xray-collector', null)
+  return injected ?? getCollector()
 }

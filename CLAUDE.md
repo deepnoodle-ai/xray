@@ -25,6 +25,24 @@ npm run dev -w packages/core
 
 # Clean build artifacts
 npm run clean
+
+# Lint all packages
+npm run lint
+
+# Lint and fix issues
+npm run lint:fix
+
+# Format code
+npm run format
+
+# Run tests
+npm run test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
 ```
 
 ## Architecture
@@ -64,3 +82,18 @@ All shared types are in `packages/core/src/types.ts`:
 ### Production Builds
 
 Each package exports a `/noop` subpath with empty implementations for tree-shaking in production.
+
+## Skills
+
+### xray-developer
+
+Use the `/xray-developer` skill when working with a frontend application that has xray enabled. This skill teaches you how to:
+
+- Inspect component state via HTTP endpoints
+- Check for JavaScript errors and failed network requests
+- Interact with the DOM (click, fill, scroll)
+- Navigate the application
+- Trigger registered actions
+- Validate state with assertions
+
+See `.claude/skills/xray-developer/SKILL.md` for the full reference.

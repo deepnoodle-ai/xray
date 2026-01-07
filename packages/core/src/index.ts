@@ -1,43 +1,45 @@
 // Core exports - framework agnostic
-export { createCollector, getCollector, setCollector } from "./collector.js";
-export { setupInterceptors } from "./interceptors.js";
 
 // Browser utilities
 export {
-  queryDom,
   captureScreenshot,
-  getViewportInfo,
+  clickElement,
+  executeAction,
+  fillInput,
+  getAccessibilityInfo,
+  getActions,
+  getFocusInfo,
   getPerformanceMetrics,
   getStorageInfo,
-  getFocusInfo,
-  getAccessibilityInfo,
-  clickElement,
-  fillInput,
-  scrollTo,
-  navigate,
-  refresh,
+  getViewportInfo,
   goBack,
   goForward,
+  navigate,
+  queryDom,
+  refresh,
   registerAction,
+  scrollTo,
   unregisterAction,
-  getActions,
-  executeAction,
-} from "./browser.js";
+} from './browser.js'
+export { createCollector, getCollector, setCollector } from './collector.js'
+export { setupInterceptors } from './interceptors.js'
+export type { SafeSerializeOptions } from './serializer.js'
+export { safeSerialize, safeStringify } from './serializer.js'
 
 // Types
 export type {
-  XrayState,
-  XrayConfig,
-  XrayCollector,
-  XrayError,
-  XrayAction,
-  ConsoleEntry,
-  NetworkRequest,
-  RegisteredState,
   AssertionResult,
-  ViewportInfo,
-  PerformanceMetrics,
+  ConsoleEntry,
   DomQueryResult,
-  StorageInfo,
   FocusInfo,
-} from "./types.js";
+  NetworkRequest,
+  PerformanceMetrics,
+  RegisteredState,
+  StorageInfo,
+  ViewportInfo,
+  XrayAction,
+  XrayCollector,
+  XrayConfig,
+  XrayError,
+  XrayState,
+} from './types.js'

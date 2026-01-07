@@ -1,10 +1,10 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ["src/index.ts", "src/noop.ts"],
-  format: ["esm"],
+  entry: ['src/index.ts', 'src/noop.ts'],
+  format: ['esm'],
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ["svelte", "svelte/store", "xray-core"],
-});
+  external: ['svelte', 'svelte/store', 'xray-core'],
+})

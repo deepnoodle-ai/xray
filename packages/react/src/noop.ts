@@ -3,19 +3,46 @@
  * Import this instead of xray-react in production for zero bundle impact.
  */
 
-import type { ReactNode, ReactElement } from "react";
+import type { ReactElement, ReactNode } from 'react'
+import type { XrayCollector, XrayConfig } from 'xray-core'
+
+// Create a no-op collector that satisfies the interface
+const noopCollector: XrayCollector = {
+  getState: () => ({
+    timestamp: '',
+    url: '',
+    route: '',
+    title: '',
+    registered: {},
+    errors: [],
+    warnings: [],
+    console: [],
+    network: [],
+  }),
+  registerState: () => {},
+  unregisterState: () => {},
+  addError: () => {},
+  addConsole: () => {},
+  addNetwork: () => {},
+  updateNetwork: () => {},
+  clear: () => {},
+}
 
 // React-specific no-ops
 export function XrayProvider({
   children,
+  enabled: _enabled,
+  config: _config,
 }: {
-  children: ReactNode;
+  children: ReactNode
+  enabled?: boolean
+  config?: XrayConfig
 }): ReactElement {
-  return children as ReactElement;
+  return children as ReactElement
 }
 
-export function useXrayCollector() {
-  return null;
+export function useXrayCollector(): XrayCollector {
+  return noopCollector
 }
 
 export function useXray(_name: string, _state: unknown): void {
@@ -29,7 +56,7 @@ export function useXrayCustom(_name: string, _state: unknown): void {
 export function useXrayLazy(
   _name: string,
   _getValue: () => unknown,
-  _deps: unknown[]
+  _deps: unknown[],
 ): void {
   // no-op
 }
@@ -37,10 +64,10 @@ export function useXrayLazy(
 export function useXrayAction(
   _name: string,
   _handler: (...args: unknown[]) => unknown,
-  _description?: string
+  _description?: string,
 ): void {
   // no-op
 }
 
 // Re-export core no-ops
-export * from "xray-core/noop";
+export * from 'xray-core/noop'

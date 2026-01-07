@@ -1,5 +1,10 @@
-import { useEffect, useRef, useCallback } from "react";
-import { getCollector, registerAction, unregisterAction } from "xray-core";
+import { useCallback, useEffect, useRef } from 'react'
+import {
+  getCollector,
+  registerAction,
+  safeSerialize,
+  unregisterAction,
+} from 'xray-core'
 
 /**
  * Register state with react-xray for inspection.
@@ -20,23 +25,23 @@ import { getCollector, registerAction, unregisterAction } from "xray-core";
  * ```
  */
 export function useXray(name: string, state: unknown): void {
-  const collector = getCollector();
-  const prevStateRef = useRef<string>();
+  const collector = getCollector()
+  const prevStateRef = useRef<string>()
 
   useEffect(() => {
-    if (!collector) return;
+    if (!collector) return
 
-    // Only update if state actually changed (shallow JSON comparison)
-    const serialized = JSON.stringify(state);
+    // Only update if state actually changed (shallow comparison via safe serialization)
+    const serialized = safeSerialize(state)
     if (serialized !== prevStateRef.current) {
-      prevStateRef.current = serialized;
-      collector.registerState(name, state);
+      prevStateRef.current = serialized
+      collector.registerState(name, state)
     }
 
     return () => {
-      collector.unregisterState(name);
-    };
-  }, [name, state, collector]);
+      collector.unregisterState(name)
+    }
+  }, [name, state, collector])
 }
 
 /**
@@ -61,7 +66,7 @@ export function useXray(name: string, state: unknown): void {
  */
 export function useXrayCustom(name: string, state: unknown): void {
   // Same implementation, different name for semantic clarity
-  useXray(name, state);
+  useXray(name, state)
 }
 
 /**
@@ -75,21 +80,21 @@ export function useXrayCustom(name: string, state: unknown): void {
 export function useXrayLazy(
   name: string,
   getValue: () => unknown,
-  deps: unknown[]
+  deps: unknown[],
 ): void {
-  const collector = getCollector();
+  const collector = getCollector()
 
   useEffect(() => {
-    if (!collector) return;
+    if (!collector) return
 
-    const state = getValue();
-    collector.registerState(name, state);
+    const state = getValue()
+    collector.registerState(name, state)
 
     return () => {
-      collector.unregisterState(name);
-    };
+      collector.unregisterState(name)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, collector, ...deps]);
+  }, [name, collector, ...deps, getValue])
 }
 
 /**
@@ -125,21 +130,21 @@ export function useXrayLazy(
 export function useXrayAction(
   name: string,
   handler: (...args: unknown[]) => unknown | Promise<unknown>,
-  description?: string
+  description?: string,
 ): void {
   // Memoize handler to avoid re-registering on every render
-  const handlerRef = useRef(handler);
-  handlerRef.current = handler;
+  const handlerRef = useRef(handler)
+  handlerRef.current = handler
 
   const stableHandler = useCallback((...args: unknown[]) => {
-    return handlerRef.current(...args);
-  }, []);
+    return handlerRef.current(...args)
+  }, [])
 
   useEffect(() => {
-    registerAction({ name, handler: stableHandler, description });
+    registerAction({ name, handler: stableHandler, description })
 
     return () => {
-      unregisterAction(name);
-    };
-  }, [name, stableHandler, description]);
+      unregisterAction(name)
+    }
+  }, [name, stableHandler, description])
 }
