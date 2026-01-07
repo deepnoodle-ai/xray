@@ -1,0 +1,53 @@
+{
+  "name": "xray-vue",
+  "version": "0.1.0",
+  "description": "Vue bindings for xray - give your AI agent eyes into your Vue app's runtime state",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./noop": {
+      "types": "./dist/noop.d.ts",
+      "import": "./dist/noop.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "xray-core": "^0.1.0"
+  },
+  "peerDependencies": {
+    "vue": ">=3.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vue": "^3.4.0"
+  },
+  "keywords": [
+    "vue",
+    "xray",
+    "debugging",
+    "ai",
+    "agent",
+    "devtools",
+    "inspector"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deepnoodle-ai/react-xray",
+    "directory": "packages/vue"
+  }
+}
