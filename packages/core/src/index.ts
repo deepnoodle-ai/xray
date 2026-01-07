@@ -4,11 +4,14 @@
 export {
   captureScreenshot,
   clickElement,
+  createXrayScope,
   executeAction,
+  executeFunction,
   fillInput,
   getAccessibilityInfo,
   getActions,
   getFocusInfo,
+  getFunctions,
   getPerformanceMetrics,
   getStorageInfo,
   getViewportInfo,
@@ -18,8 +21,10 @@ export {
   queryDom,
   refresh,
   registerAction,
+  registerFunction,
   scrollTo,
   unregisterAction,
+  unregisterFunction,
 } from './browser.js'
 export { createCollector, getCollector, setCollector } from './collector.js'
 export { setupInterceptors } from './interceptors.js'
@@ -42,5 +47,7 @@ export type {
   XrayCollector,
   XrayConfig,
   XrayError,
+  XrayFunction,
+  XrayScope,
   XrayState,
 } from './types.js'

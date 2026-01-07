@@ -4,12 +4,12 @@ Give your AI agent eyes into your app's runtime state. Works with **React**, **V
 
 ## Packages
 
-| Package | Description |
-|---------|-------------|
-| [`xray-core`](./packages/core) | Core utilities and Vite plugin |
-| [`xray-react`](./packages/react) | React bindings |
-| [`xray-vue`](./packages/vue) | Vue bindings |
-| [`xray-svelte`](./packages/svelte) | Svelte bindings |
+| Package                            | Description                    |
+| ---------------------------------- | ------------------------------ |
+| [`xray-core`](./packages/core)     | Core utilities and Vite plugin |
+| [`xray-react`](./packages/react)   | React bindings                 |
+| [`xray-vue`](./packages/vue)       | Vue bindings                   |
+| [`xray-svelte`](./packages/svelte) | Svelte bindings                |
 
 ## The Problem
 
@@ -55,7 +55,7 @@ npm install xray-svelte xray-core
 import { xrayPlugin } from "xray-core/vite";
 
 export default {
-  plugins: [/* your framework plugin */, xrayPlugin()],
+  plugins: [, /* your framework plugin */ xrayPlugin()],
 };
 ```
 
@@ -123,7 +123,7 @@ const data = reactive({ items: [], loading: false });
 // Track reactive state
 useXray("Dashboard", () => ({
   filter: filter.value,
-  itemCount: data.items.length
+  itemCount: data.items.length,
 }));
 
 // Register an action agents can trigger
@@ -184,41 +184,49 @@ useXrayAction("refreshData", () => fetchData(), "Refresh dashboard data");
 
 ### State & Query
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /xray/state` | Full state dump |
+| Endpoint                         | Description              |
+| -------------------------------- | ------------------------ |
+| `GET /xray/state`                | Full state dump          |
 | `GET /xray/query?component=Name` | Query specific component |
-| `GET /xray/errors` | Check for errors |
-| `GET /xray/clear` | Clear captured state |
-| `GET /xray/assert?errors=empty` | Make assertions |
+| `GET /xray/errors`               | Check for errors         |
+| `GET /xray/clear`                | Clear captured state     |
+| `GET /xray/assert?errors=empty`  | Make assertions          |
 
 ### DOM & Interaction
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /xray/dom?selector=.btn` | Query DOM elements |
-| `GET /xray/click?selector=.btn` | Click an element |
-| `POST /xray/fill` | Fill an input (`selector`, `value`) |
-| `GET /xray/scroll?selector=#footer` | Scroll to element |
+| Endpoint                            | Description                         |
+| ----------------------------------- | ----------------------------------- |
+| `GET /xray/dom?selector=.btn`       | Query DOM elements                  |
+| `GET /xray/click?selector=.btn`     | Click an element                    |
+| `POST /xray/fill`                   | Fill an input (`selector`, `value`) |
+| `GET /xray/scroll?selector=#footer` | Scroll to element                   |
 
 ### Navigation
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /xray/navigate?url=/path` | Navigate to URL |
-| `GET /xray/refresh` | Refresh the page |
-| `GET /xray/back` | Go back in history |
-| `GET /xray/forward` | Go forward in history |
+| Endpoint                       | Description           |
+| ------------------------------ | --------------------- |
+| `GET /xray/navigate?url=/path` | Navigate to URL       |
+| `GET /xray/refresh`            | Refresh the page      |
+| `GET /xray/back`               | Go back in history    |
+| `GET /xray/forward`            | Go forward in history |
 
-### Actions & Diagnostics
+### Functions & Actions
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /xray/actions` | List registered actions |
-| `POST /xray/action` | Execute action (`name`, `args`) |
-| `GET /xray/screenshot` | Capture screenshot (needs html2canvas) |
-| `GET /xray/diagnostics` | Viewport, performance, storage info |
-| `GET /xray/a11y` | Accessibility information |
+| Endpoint                 | Description                            |
+| ------------------------ | -------------------------------------- |
+| `GET /xray/functions`    | List registered functions              |
+| `GET /xray/call/:name`   | Call a function (no args)              |
+| `POST /xray/call/:name`  | Call a function with `{ args: [...] }` |
+| `GET /xray/actions`      | List registered actions                |
+| `POST /xray/action`      | Execute action (`name`, `args`)        |
+
+### Diagnostics
+
+| Endpoint                | Description                            |
+| ----------------------- | -------------------------------------- |
+| `GET /xray/screenshot`  | Capture screenshot (needs html2canvas) |
+| `GET /xray/diagnostics` | Viewport, performance, storage info    |
+| `GET /xray/a11y`        | Accessibility information              |
 
 ---
 
@@ -227,6 +235,107 @@ useXrayAction("refreshData", () => fetchData(), "Refresh dashboard data");
 - **Errors**: Uncaught exceptions and unhandled promise rejections
 - **Console**: All console.log, warn, error, info, debug calls
 - **Network**: All fetch requests with status, duration, and errors
+
+---
+
+## Custom Functions
+
+Register custom functions that agents can call remotely. Unlike actions (for triggering side effects), functions are for **data retrieval** - screenshots, canvas captures, game state dumps, etc.
+
+### React
+
+```tsx
+import { useXrayFunction, useXrayScope } from "xray-react";
+
+function GameCanvas({ canvasId }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Simple function registration
+  useXrayFunction("captureCanvas", () => {
+    return canvasRef.current?.toDataURL("image/png");
+  });
+
+  // Scoped functions (for multiple instances)
+  const xray = useXrayScope(`canvas.${canvasId}`);
+
+  useEffect(() => {
+    xray.registerFunction("capture", () => canvasRef.current?.toDataURL());
+    xray.registerFunction("getSize", () => ({
+      width: canvasRef.current?.width,
+      height: canvasRef.current?.height,
+    }));
+  }, [xray]);
+
+  return <canvas ref={canvasRef} />;
+}
+```
+
+### Vue
+
+```vue
+<script setup>
+import { ref } from "vue";
+import { useXrayFunction, useXrayScope } from "xray-vue";
+
+const props = defineProps<{ canvasId: string }>();
+const canvasRef = ref<HTMLCanvasElement>();
+
+// Simple function registration
+useXrayFunction("captureCanvas", () => {
+  return canvasRef.value?.toDataURL("image/png");
+});
+
+// Scoped functions
+const xray = useXrayScope(`canvas.${props.canvasId}`);
+xray.registerFunction("capture", () => canvasRef.value?.toDataURL());
+</script>
+```
+
+### Svelte
+
+```svelte
+<script>
+  import { registerXrayFunction, createXrayScopeWithCleanup } from "xray-svelte";
+  import { onDestroy } from "svelte";
+
+  export let canvasId;
+  let canvas;
+
+  // Simple function registration
+  const unregister = registerXrayFunction("captureCanvas", () => {
+    return canvas?.toDataURL("image/png");
+  });
+
+  // Scoped functions
+  const { scope, cleanup } = createXrayScopeWithCleanup(`canvas.${canvasId}`);
+  scope.registerFunction("capture", () => canvas?.toDataURL());
+
+  onDestroy(() => {
+    unregister();
+    cleanup();
+  });
+</script>
+
+<canvas bind:this={canvas} />
+```
+
+### Calling Functions
+
+```bash
+# List available functions
+curl localhost:5173/xray/functions
+
+# Call a simple function
+curl localhost:5173/xray/call/captureCanvas
+
+# Call a scoped function
+curl localhost:5173/xray/call/canvas.main.capture
+
+# Call with arguments
+curl -X POST localhost:5173/xray/call/getGameState \
+  -H "Content-Type: application/json" \
+  -d '{"args": ["detailed"]}'
+```
 
 ---
 
@@ -255,12 +364,14 @@ For zero bundle impact in production:
 // vite.config.ts
 export default defineConfig({
   resolve: {
-    alias: import.meta.env.PROD ? {
-      'xray-react': 'xray-react/noop',
-      'xray-vue': 'xray-vue/noop',
-      'xray-svelte': 'xray-svelte/noop',
-    } : {}
-  }
+    alias: import.meta.env.PROD
+      ? {
+          "xray-react": "xray-react/noop",
+          "xray-vue": "xray-vue/noop",
+          "xray-svelte": "xray-svelte/noop",
+        }
+      : {},
+  },
 });
 ```
 

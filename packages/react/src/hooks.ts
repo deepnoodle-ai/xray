@@ -1,9 +1,13 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
+import type { XrayScope } from 'xray-core'
 import {
+  createXrayScope,
   getCollector,
   registerAction,
+  registerFunction,
   safeSerialize,
   unregisterAction,
+  unregisterFunction,
 } from 'xray-core'
 
 /**
@@ -147,4 +151,124 @@ export function useXrayAction(
       unregisterAction(name)
     }
   }, [name, stableHandler, description])
+}
+
+/**
+ * Register a function that can be called remotely via HTTP.
+ * Functions are for data retrieval (screenshots, state dumps, etc.).
+ *
+ * @param name - Unique identifier for this function (can use dot notation for namespacing)
+ * @param handler - Function that returns data when called
+ * @param description - Optional description shown when listing functions
+ *
+ * @example
+ * ```tsx
+ * function GameCanvas({ renderer }) {
+ *   useXrayFunction('captureCanvas', () => {
+ *     return renderer.domElement.toDataURL('image/png');
+ *   });
+ *
+ *   return <canvas ref={canvasRef} />;
+ * }
+ * ```
+ *
+ * Agent can then call:
+ * ```bash
+ * curl localhost:5173/xray/call/captureCanvas
+ * # { "success": true, "result": "data:image/png;base64,..." }
+ * ```
+ */
+export function useXrayFunction(
+  name: string,
+  handler: (...args: unknown[]) => unknown | Promise<unknown>,
+  description?: string,
+): void {
+  // Memoize handler to avoid re-registering on every render
+  const handlerRef = useRef(handler)
+  handlerRef.current = handler
+
+  const stableHandler = useCallback((...args: unknown[]) => {
+    return handlerRef.current(...args)
+  }, [])
+
+  useEffect(() => {
+    registerFunction({ name, handler: stableHandler, description })
+
+    return () => {
+      unregisterFunction(name)
+    }
+  }, [name, stableHandler, description])
+}
+
+/**
+ * Create a scoped function registry with automatic cleanup.
+ * All functions registered through the scope are prefixed with the given prefix.
+ *
+ * @param prefix - Prefix for all function names (e.g., "canvas.main")
+ * @returns Scoped registry with registerFunction and unregisterFunction
+ *
+ * @example
+ * ```tsx
+ * function GameCanvas({ canvasId }) {
+ *   const xray = useXrayScope(`canvas.${canvasId}`);
+ *
+ *   useEffect(() => {
+ *     xray.registerFunction('capture', () => canvasRef.current.toDataURL());
+ *     xray.registerFunction('getSize', () => ({
+ *       width: canvasRef.current.width,
+ *       height: canvasRef.current.height
+ *     }));
+ *   }, [xray]);
+ *
+ *   return <canvas ref={canvasRef} />;
+ * }
+ * ```
+ *
+ * Agent can then call:
+ * ```bash
+ * curl localhost:5173/xray/call/canvas.main.capture
+ * curl localhost:5173/xray/call/canvas.minimap.getSize
+ * ```
+ */
+export function useXrayScope(prefix: string): XrayScope {
+  // Track registered function names for cleanup
+  const registeredNames = useRef<Set<string>>(new Set())
+
+  // Create a stable scope object
+  const scope = useMemo(() => {
+    const baseScope = createXrayScope(prefix)
+
+    return {
+      registerFunction: (
+        nameOrFn:
+          | string
+          | {
+              name: string
+              description?: string
+              handler: (...args: unknown[]) => unknown | Promise<unknown>
+            },
+        handler?: (...args: unknown[]) => unknown | Promise<unknown>,
+      ) => {
+        const name = typeof nameOrFn === 'string' ? nameOrFn : nameOrFn.name
+        registeredNames.current.add(name)
+        baseScope.registerFunction(nameOrFn, handler)
+      },
+      unregisterFunction: (name: string) => {
+        registeredNames.current.delete(name)
+        baseScope.unregisterFunction(name)
+      },
+    }
+  }, [prefix])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      for (const name of registeredNames.current) {
+        unregisterFunction(`${prefix}.${name}`)
+      }
+      registeredNames.current.clear()
+    }
+  }, [prefix])
+
+  return scope
 }

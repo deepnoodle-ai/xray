@@ -1,6 +1,13 @@
 import { inject, onUnmounted, type Ref, type WatchSource, watch } from 'vue'
-import type { XrayCollector } from 'xray-core'
-import { getCollector, registerAction, unregisterAction } from 'xray-core'
+import type { XrayCollector, XrayScope } from 'xray-core'
+import {
+  createXrayScope,
+  getCollector,
+  registerAction,
+  registerFunction,
+  unregisterAction,
+  unregisterFunction,
+} from 'xray-core'
 
 /**
  * Register reactive state with xray for inspection.
@@ -99,4 +106,97 @@ export function useXrayAction(
 export function useXrayCollector(): XrayCollector | null {
   const injected = inject<XrayCollector | null>('xray-collector', null)
   return injected ?? getCollector()
+}
+
+/**
+ * Register a function that can be called remotely via HTTP.
+ * Functions are for data retrieval (screenshots, state dumps, etc.).
+ *
+ * @param name - Unique identifier for this function (can use dot notation for namespacing)
+ * @param handler - Function that returns data when called
+ * @param description - Optional description shown when listing functions
+ *
+ * @example
+ * ```vue
+ * <script setup>
+ * import { useXrayFunction } from 'xray/vue';
+ *
+ * const canvasRef = ref<HTMLCanvasElement>();
+ *
+ * useXrayFunction('captureCanvas', () => {
+ *   return canvasRef.value?.toDataURL('image/png');
+ * });
+ * </script>
+ * ```
+ */
+export function useXrayFunction(
+  name: string,
+  handler: (...args: unknown[]) => unknown | Promise<unknown>,
+  description?: string,
+): void {
+  registerFunction({ name, handler, description })
+
+  onUnmounted(() => {
+    unregisterFunction(name)
+  })
+}
+
+/**
+ * Create a scoped function registry with automatic cleanup.
+ * All functions registered through the scope are prefixed with the given prefix.
+ *
+ * @param prefix - Prefix for all function names (e.g., "canvas.main")
+ * @returns Scoped registry with registerFunction and unregisterFunction
+ *
+ * @example
+ * ```vue
+ * <script setup>
+ * import { useXrayScope } from 'xray/vue';
+ *
+ * const props = defineProps<{ canvasId: string }>();
+ * const canvasRef = ref<HTMLCanvasElement>();
+ *
+ * const xray = useXrayScope(`canvas.${props.canvasId}`);
+ *
+ * xray.registerFunction('capture', () => canvasRef.value?.toDataURL());
+ * xray.registerFunction('getSize', () => ({
+ *   width: canvasRef.value?.width,
+ *   height: canvasRef.value?.height
+ * }));
+ * </script>
+ * ```
+ */
+export function useXrayScope(prefix: string): XrayScope {
+  const registeredNames = new Set<string>()
+  const baseScope = createXrayScope(prefix)
+
+  const scope: XrayScope = {
+    registerFunction: (
+      nameOrFn:
+        | string
+        | {
+            name: string
+            description?: string
+            handler: (...args: unknown[]) => unknown | Promise<unknown>
+          },
+      handler?: (...args: unknown[]) => unknown | Promise<unknown>,
+    ) => {
+      const name = typeof nameOrFn === 'string' ? nameOrFn : nameOrFn.name
+      registeredNames.add(name)
+      baseScope.registerFunction(nameOrFn, handler)
+    },
+    unregisterFunction: (name: string) => {
+      registeredNames.delete(name)
+      baseScope.unregisterFunction(name)
+    },
+  }
+
+  onUnmounted(() => {
+    for (const name of registeredNames) {
+      unregisterFunction(`${prefix}.${name}`)
+    }
+    registeredNames.clear()
+  })
+
+  return scope
 }

@@ -868,6 +868,87 @@ export function xrayPlugin(options: XrayPluginOptions = {}): Plugin {
         },
       )
 
+      // GET /xray/functions - List registered functions
+      server.middlewares.use(
+        '/xray/functions',
+        async (req: IncomingMessage, res: ServerResponse) => {
+          if (!checkAuth(req, secret)) {
+            sendUnauthorized(res)
+            return
+          }
+
+          res.setHeader('Content-Type', 'application/json')
+          res.setHeader('Access-Control-Allow-Origin', '*')
+
+          try {
+            const result = await queueCommand('getFunctions', [])
+            res.end(JSON.stringify({ functions: result }, null, 2))
+          } catch (err) {
+            res.end(
+              JSON.stringify({
+                error: err instanceof Error ? err.message : String(err),
+              }),
+            )
+          }
+        },
+      )
+
+      // GET/POST /xray/call/* - Call a registered function
+      server.middlewares.use(
+        '/xray/call/',
+        async (req: IncomingMessage, res: ServerResponse) => {
+          if (!checkAuth(req, secret)) {
+            sendUnauthorized(res)
+            return
+          }
+
+          res.setHeader('Content-Type', 'application/json')
+          res.setHeader('Access-Control-Allow-Origin', '*')
+
+          // Extract function name from path: /xray/call/foo.bar -> foo.bar
+          const url = new URL(req.url ?? '', 'http://localhost')
+          const fullPath = url.pathname
+          const fnName = fullPath.replace(/^\/xray\/call\//, '')
+
+          if (!fnName) {
+            res.end(
+              JSON.stringify({
+                error: 'Missing function name. Use /xray/call/<name>',
+              }),
+            )
+            return
+          }
+
+          let args: unknown[] = []
+
+          // For POST requests, parse args from body
+          if (req.method === 'POST') {
+            const body = await readBodyWithLimit(req, res, maxRequestBodySize)
+            if (body === null) return // Response already sent (413 or error)
+
+            try {
+              const parsed = JSON.parse(body)
+              args = Array.isArray(parsed.args) ? parsed.args : []
+            } catch {
+              res.statusCode = 400
+              res.end(JSON.stringify({ error: 'Invalid JSON body' }))
+              return
+            }
+          }
+
+          try {
+            const result = await queueCommand('executeFunction', [fnName, args])
+            res.end(JSON.stringify(result, null, 2))
+          } catch (err) {
+            res.end(
+              JSON.stringify({
+                error: err instanceof Error ? err.message : String(err),
+              }),
+            )
+          }
+        },
+      )
+
       // GET /xray/scroll - Scroll to element or position
       server.middlewares.use(
         '/xray/scroll',
@@ -934,9 +1015,13 @@ export function xrayPlugin(options: XrayPluginOptions = {}): Plugin {
       console.log('       GET  /xray/refresh     - Refresh the page')
       console.log('       GET  /xray/back        - Go back in history')
       console.log('       GET  /xray/forward     - Go forward in history')
-      console.log('     Actions & Diagnostics:')
+      console.log('     Functions & Actions:')
+      console.log('       GET  /xray/functions   - List registered functions')
+      console.log('       GET  /xray/call/:name  - Call function (no args)')
+      console.log('       POST /xray/call/:name  - Call function with args')
       console.log('       GET  /xray/actions     - List registered actions')
       console.log('       POST /xray/action      - Execute action (name=)')
+      console.log('     Diagnostics:')
       console.log('       GET  /xray/screenshot  - Capture screenshot')
       console.log('       GET  /xray/diagnostics - Extended diagnostics')
       console.log('       GET  /xray/a11y        - Accessibility info\n')

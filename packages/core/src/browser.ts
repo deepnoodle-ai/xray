@@ -10,6 +10,8 @@ import type {
   StorageInfo,
   ViewportInfo,
   XrayAction,
+  XrayFunction,
+  XrayScope,
 } from './types.js'
 
 // Action registry
@@ -44,6 +46,99 @@ export async function executeAction(
       success: false,
       error: err instanceof Error ? err.message : String(err),
     }
+  }
+}
+
+// Function registry
+const functions = new Map<string, XrayFunction>()
+
+/**
+ * Register a callable function.
+ * Can be called with an XrayFunction object or with name + handler.
+ */
+export function registerFunction(fn: XrayFunction): void
+export function registerFunction(
+  name: string,
+  handler: XrayFunction['handler'],
+): void
+export function registerFunction(
+  nameOrFn: string | XrayFunction,
+  handler?: XrayFunction['handler'],
+): void {
+  if (typeof nameOrFn === 'string') {
+    if (!handler) {
+      throw new Error('Handler is required when registering with name string')
+    }
+    functions.set(nameOrFn, { name: nameOrFn, handler })
+  } else {
+    functions.set(nameOrFn.name, nameOrFn)
+  }
+}
+
+export function unregisterFunction(name: string): void {
+  functions.delete(name)
+}
+
+/**
+ * Get all registered functions (without handlers for serialization).
+ */
+export function getFunctions(): Array<{ name: string; description?: string }> {
+  return Array.from(functions.values()).map(({ name, description }) => ({
+    name,
+    ...(description && { description }),
+  }))
+}
+
+/**
+ * Execute a registered function by name.
+ */
+export async function executeFunction(
+  name: string,
+  args: unknown[] = [],
+): Promise<{ success: boolean; result?: unknown; error?: string }> {
+  const fn = functions.get(name)
+  if (!fn) {
+    return { success: false, error: `Function "${name}" not found` }
+  }
+
+  try {
+    const result = await fn.handler(...args)
+    return { success: true, result }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : String(err),
+    }
+  }
+}
+
+/**
+ * Create a scoped function registry with a prefix.
+ * All functions registered through the scope will be prefixed with `prefix.`
+ */
+export function createXrayScope(prefix: string): XrayScope {
+  return {
+    registerFunction: (
+      nameOrFn: string | XrayFunction,
+      handler?: XrayFunction['handler'],
+    ) => {
+      if (typeof nameOrFn === 'string') {
+        if (!handler) {
+          throw new Error(
+            'Handler is required when registering with name string',
+          )
+        }
+        registerFunction(`${prefix}.${nameOrFn}`, handler)
+      } else {
+        registerFunction({
+          ...nameOrFn,
+          name: `${prefix}.${nameOrFn.name}`,
+        })
+      }
+    },
+    unregisterFunction: (name: string) => {
+      unregisterFunction(`${prefix}.${name}`)
+    },
   }
 }
 
@@ -497,5 +592,7 @@ if (typeof window !== 'undefined') {
     goForward,
     executeAction,
     getActions,
+    executeFunction,
+    getFunctions,
   }
 }

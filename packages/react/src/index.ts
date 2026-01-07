@@ -14,6 +14,8 @@ export type {
   XrayCollector,
   XrayConfig,
   XrayError,
+  XrayFunction,
+  XrayScope,
   XrayState,
 } from 'xray-core'
 // Re-export core types and utilities for convenience
@@ -21,12 +23,15 @@ export {
   captureScreenshot,
   clickElement,
   createCollector,
+  createXrayScope,
   executeAction,
+  executeFunction,
   fillInput,
   getAccessibilityInfo,
   getActions,
   getCollector,
   getFocusInfo,
+  getFunctions,
   getPerformanceMetrics,
   getStorageInfo,
   getViewportInfo,
@@ -36,10 +41,19 @@ export {
   queryDom,
   refresh,
   registerAction,
+  registerFunction,
   scrollTo,
   setCollector,
   setupInterceptors,
   unregisterAction,
+  unregisterFunction,
 } from 'xray-core'
-export { useXray, useXrayAction, useXrayCustom, useXrayLazy } from './hooks.js'
+export {
+  useXray,
+  useXrayAction,
+  useXrayCustom,
+  useXrayFunction,
+  useXrayLazy,
+  useXrayScope,
+} from './hooks.js'
 export { useXrayCollector, XrayProvider } from './provider.js'

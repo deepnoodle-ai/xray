@@ -76,6 +76,20 @@ export interface XrayAction {
   handler: (...args: unknown[]) => unknown | Promise<unknown>
 }
 
+export interface XrayFunction {
+  name: string
+  description?: string
+  handler: (...args: unknown[]) => unknown | Promise<unknown>
+}
+
+export interface XrayScope {
+  registerFunction: (
+    nameOrFn: string | XrayFunction,
+    handler?: XrayFunction['handler'],
+  ) => void
+  unregisterFunction: (name: string) => void
+}
+
 export interface ViewportInfo {
   width: number
   height: number

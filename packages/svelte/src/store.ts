@@ -1,12 +1,15 @@
 import type { Readable, Writable } from 'svelte/store'
-import type { XrayCollector, XrayConfig } from 'xray-core'
+import type { XrayCollector, XrayConfig, XrayScope } from 'xray-core'
 import {
   createCollector,
+  createXrayScope,
   getCollector,
   registerAction,
+  registerFunction,
   setCollector,
   setupInterceptors,
   unregisterAction,
+  unregisterFunction,
 } from 'xray-core'
 
 // Import to ensure browser utilities are loaded and attached to window
@@ -351,4 +354,103 @@ export function registerXrayAction(
  */
 export function getXrayCollector(): XrayCollector | null {
   return getCollector()
+}
+
+/**
+ * Register a function that can be called remotely via HTTP.
+ * Functions are for data retrieval (screenshots, state dumps, etc.).
+ *
+ * @param name - Unique identifier for this function (can use dot notation for namespacing)
+ * @param handler - Function that returns data when called
+ * @param description - Optional description shown when listing functions
+ * @returns Unregister function
+ *
+ * @example
+ * ```svelte
+ * <script>
+ *   import { registerXrayFunction } from 'xray-svelte';
+ *   import { onDestroy } from 'svelte';
+ *
+ *   let canvas: HTMLCanvasElement;
+ *
+ *   const unregister = registerXrayFunction('captureCanvas', () => {
+ *     return canvas?.toDataURL('image/png');
+ *   });
+ *   onDestroy(unregister);
+ * </script>
+ * ```
+ */
+export function registerXrayFunction(
+  name: string,
+  handler: (...args: unknown[]) => unknown | Promise<unknown>,
+  description?: string,
+): () => void {
+  registerFunction({ name, handler, description })
+  return () => unregisterFunction(name)
+}
+
+/**
+ * Create a scoped function registry.
+ * All functions registered through the scope are prefixed with the given prefix.
+ *
+ * @param prefix - Prefix for all function names (e.g., "canvas.main")
+ * @returns Object with registerFunction and unregisterFunction that auto-prefix names
+ *
+ * @example
+ * ```svelte
+ * <script>
+ *   import { createXrayScopeWithCleanup } from 'xray-svelte';
+ *   import { onDestroy } from 'svelte';
+ *
+ *   export let canvasId: string;
+ *   let canvas: HTMLCanvasElement;
+ *
+ *   const { scope, cleanup } = createXrayScopeWithCleanup(`canvas.${canvasId}`);
+ *
+ *   scope.registerFunction('capture', () => canvas?.toDataURL());
+ *   scope.registerFunction('getSize', () => ({
+ *     width: canvas?.width,
+ *     height: canvas?.height
+ *   }));
+ *
+ *   onDestroy(cleanup);
+ * </script>
+ * ```
+ */
+export function createXrayScopeWithCleanup(prefix: string): {
+  scope: XrayScope
+  cleanup: () => void
+} {
+  const registeredNames = new Set<string>()
+  const baseScope = createXrayScope(prefix)
+
+  const scope: XrayScope = {
+    registerFunction: (
+      nameOrFn:
+        | string
+        | {
+            name: string
+            description?: string
+            handler: (...args: unknown[]) => unknown | Promise<unknown>
+          },
+      handler?: (...args: unknown[]) => unknown | Promise<unknown>,
+    ) => {
+      const name = typeof nameOrFn === 'string' ? nameOrFn : nameOrFn.name
+      registeredNames.add(name)
+      baseScope.registerFunction(nameOrFn, handler)
+    },
+    unregisterFunction: (name: string) => {
+      registeredNames.delete(name)
+      baseScope.unregisterFunction(name)
+    },
+  }
+
+  const cleanup = () => {
+    for (const name of registeredNames) {
+      unregisterFunction(`${prefix}.${name}`)
+    }
+    registeredNames.clear()
+  }
+
+  return { scope, cleanup }
 }
