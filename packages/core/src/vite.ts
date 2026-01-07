@@ -189,6 +189,10 @@ function readBodyWithLimit(
 
     req.on('error', () => {
       if (!aborted) {
+        aborted = true
+        res.statusCode = 500
+        res.setHeader('Content-Type', 'application/json')
+        res.end(JSON.stringify({ error: 'Request error' }))
         resolve(null)
       }
     })
@@ -950,6 +954,37 @@ export function xrayPlugin(options: XrayPluginOptions = {}): Plugin {
               let pushing = false;
               let polling = false;
 
+              // Safe serializer that handles BigInt, circular refs, etc.
+              function safeSerialize(value, seen = new WeakSet(), depth = 0) {
+                if (depth > 10) return '[Max Depth]';
+                if (value === null) return null;
+                if (value === undefined) return null;
+                if (typeof value === 'boolean' || typeof value === 'number' || typeof value === 'string') return value;
+                if (typeof value === 'bigint') return value.toString() + 'n';
+                if (typeof value === 'function') return '[Function]';
+                if (typeof value === 'symbol') return '[Symbol]';
+                if (typeof value === 'object') {
+                  if (seen.has(value)) return '[Circular]';
+                  seen.add(value);
+                  if (Array.isArray(value)) return value.map(v => safeSerialize(v, seen, depth + 1));
+                  if (value instanceof Date) return value.toISOString();
+                  if (value instanceof Error) return { name: value.name, message: value.message, stack: value.stack };
+                  if (value instanceof Map) {
+                    const obj = {};
+                    value.forEach((v, k) => { obj[String(k)] = safeSerialize(v, seen, depth + 1); });
+                    return obj;
+                  }
+                  if (value instanceof Set) return Array.from(value).map(v => safeSerialize(v, seen, depth + 1));
+                  const result = {};
+                  for (const key of Object.keys(value)) {
+                    try { result[key] = safeSerialize(value[key], seen, depth + 1); }
+                    catch { result[key] = '[Unserializable]'; }
+                  }
+                  return result;
+                }
+                return '[Unknown]';
+              }
+
               async function pushState() {
                 if (pushing) return;
                 if (!window.__XRAY_COLLECTOR__) return;
@@ -957,10 +992,11 @@ export function xrayPlugin(options: XrayPluginOptions = {}): Plugin {
                 pushing = true;
                 try {
                   const state = window.__XRAY_COLLECTOR__.getState();
+                  const serialized = safeSerialize(state);
                   await fetch('/xray/__push', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(state),
+                    body: JSON.stringify(serialized),
                   });
                 } catch (e) {
                   // Ignore push errors

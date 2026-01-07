@@ -214,10 +214,13 @@ describe('clear', () => {
 })
 
 describe('getCollector / setCollector', () => {
+  beforeEach(() => {
+    // Reset global collector before each test
+    setCollector(null)
+  })
+
   it('returns null when no collector is set', () => {
-    // Note: This may fail if previous tests set a collector
-    // In a real scenario, you'd want to reset between tests
-    expect(getCollector()).toBeDefined() // or null if reset
+    expect(getCollector()).toBeNull()
   })
 
   it('sets and retrieves the global collector', () => {

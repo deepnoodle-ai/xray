@@ -3,6 +3,7 @@
  */
 
 import type {
+  BoundingRect,
   DomQueryResult,
   FocusInfo,
   PerformanceMetrics,
@@ -100,7 +101,7 @@ export function queryDom(
       html: el.outerHTML.slice(0, 5000), // Limit size
       text: el.textContent?.slice(0, 1000) || null,
       attributes: attrs,
-      boundingRect: rect.toJSON() as DOMRect,
+      boundingRect: rect.toJSON() as BoundingRect,
       visible: isVisible,
     }
 

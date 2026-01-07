@@ -106,13 +106,25 @@ export interface FocusInfo {
   activeElementClasses: string[]
 }
 
+/** Plain object representation of a DOMRect (from DOMRect.toJSON()) */
+export interface BoundingRect {
+  x: number
+  y: number
+  width: number
+  height: number
+  top: number
+  right: number
+  bottom: number
+  left: number
+}
+
 export interface DomQueryResult {
   found: boolean
   count: number
   html: string | null
   text: string | null
   attributes: Record<string, string> | null
-  boundingRect: DOMRect | null
+  boundingRect: BoundingRect | null
   visible: boolean
   computedStyles?: Record<string, string>
 }

@@ -29,6 +29,7 @@ export { safeSerialize, safeStringify } from './serializer.js'
 // Types
 export type {
   AssertionResult,
+  BoundingRect,
   ConsoleEntry,
   DomQueryResult,
   FocusInfo,
