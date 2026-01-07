@@ -905,10 +905,11 @@ export function xrayPlugin(options: XrayPluginOptions = {}): Plugin {
           res.setHeader('Content-Type', 'application/json')
           res.setHeader('Access-Control-Allow-Origin', '*')
 
-          // Extract function name from path: /xray/call/foo.bar -> foo.bar
+          // Extract function name from path: /foo.bar -> foo.bar
+          // (Connect middleware strips the mount path, so req.url is already relative)
           const url = new URL(req.url ?? '', 'http://localhost')
           const fullPath = url.pathname
-          const fnName = fullPath.replace(/^\/xray\/call\//, '')
+          const fnName = fullPath.replace(/^\//, '')
 
           if (!fnName) {
             res.end(
