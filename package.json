@@ -19,6 +19,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
     "@vitest/coverage-v8": "^4.0.16",
+    "jsdom": "27.4.0",
     "typescript": "^5.3.0",
     "vitest": "^4.0.16"
   }

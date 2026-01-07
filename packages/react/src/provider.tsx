@@ -55,6 +55,7 @@ export function XrayProvider({
 
     return () => {
       cleanupRef.current?.()
+      setCollector(null)
       if (typeof window !== 'undefined') {
         ;(window as unknown as Record<string, unknown>).__XRAY_COLLECTOR__ =
           null

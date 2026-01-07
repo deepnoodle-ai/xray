@@ -107,6 +107,6 @@ export function getCollector(): XrayCollector | null {
   return globalCollector
 }
 
-export function setCollector(collector: XrayCollector): void {
-  globalCollector = collector
+export function setCollector(collector: XrayCollector | null): void {
+  globalCollector = collector;
 }
