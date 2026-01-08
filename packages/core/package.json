@@ -1,5 +1,5 @@
 {
-  "name": "deepnoodle/xray-core",
+  "name": "@deepnoodle/xray-core",
   "version": "0.1.0",
   "description": "Core utilities for xray - give your AI agent eyes into your app's runtime state",
   "type": "module",
@@ -51,10 +51,10 @@
     "inspector",
     "vite"
   ],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/deepnoodle-ai/react-xray",
+    "url": "https://github.com/deepnoodle-ai/xray",
     "directory": "packages/core"
   }
 }
