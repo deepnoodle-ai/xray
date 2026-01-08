@@ -1,6 +1,6 @@
 {
   "name": "@deepnoodle/xray-svelte",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Svelte bindings for xray - give your AI agent eyes into your Svelte app's runtime state",
   "type": "module",
   "main": "./dist/index.js",
@@ -25,7 +25,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@deepnoodle/xray-core": "^0.1.1"
+    "@deepnoodle/xray-core": "^0.1.3"
   },
   "peerDependencies": {
     "svelte": ">=4.0.0"
@@ -50,5 +50,8 @@
     "type": "git",
     "url": "git+https://github.com/deepnoodle-ai/xray.git",
     "directory": "packages/svelte"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
