@@ -1,6 +1,6 @@
+import type { XrayCollector } from '@deepnoodle/xray-core'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createApp } from 'vue'
-import type { XrayCollector } from '@deepnoodle/xray-core'
 import { cleanupXray, xrayVuePlugin } from './plugin.js'
 
 interface XrayWindow {

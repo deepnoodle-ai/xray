@@ -1,5 +1,8 @@
-import type { Readable, Writable } from 'svelte/store'
-import type { XrayCollector, XrayConfig, XrayScope } from '@deepnoodle/xray-core'
+import type {
+  XrayCollector,
+  XrayConfig,
+  XrayScope,
+} from '@deepnoodle/xray-core'
 import {
   createCollector,
   createXrayScope,
@@ -11,6 +14,7 @@ import {
   unregisterAction,
   unregisterFunction,
 } from '@deepnoodle/xray-core'
+import type { Readable, Writable } from 'svelte/store'
 
 // Import to ensure browser utilities are loaded and attached to window
 import '@deepnoodle/xray-core'

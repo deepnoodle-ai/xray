@@ -1,6 +1,10 @@
-import type { App, Plugin } from 'vue'
 import type { XrayCollector, XrayConfig } from '@deepnoodle/xray-core'
-import { createCollector, setCollector, setupInterceptors } from '@deepnoodle/xray-core'
+import {
+  createCollector,
+  setCollector,
+  setupInterceptors,
+} from '@deepnoodle/xray-core'
+import type { App, Plugin } from 'vue'
 
 // Import to ensure browser utilities are loaded and attached to window
 import '@deepnoodle/xray-core'

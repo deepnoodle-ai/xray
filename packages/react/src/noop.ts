@@ -3,8 +3,8 @@
  * Import this instead of xray-react in production for zero bundle impact.
  */
 
-import type { ReactElement, ReactNode } from 'react'
 import type { XrayCollector, XrayConfig } from '@deepnoodle/xray-core'
+import type { ReactElement, ReactNode } from 'react'
 
 // Create a no-op collector that satisfies the interface
 const noopCollector: XrayCollector = {

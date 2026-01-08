@@ -1,3 +1,9 @@
+import type { XrayCollector, XrayConfig } from '@deepnoodle/xray-core'
+import {
+  createCollector,
+  setCollector,
+  setupInterceptors,
+} from '@deepnoodle/xray-core'
 import React, {
   createContext,
   type ReactNode,
@@ -5,8 +11,6 @@ import React, {
   useEffect,
   useRef,
 } from 'react'
-import type { XrayCollector, XrayConfig } from '@deepnoodle/xray-core'
-import { createCollector, setCollector, setupInterceptors } from '@deepnoodle/xray-core'
 
 // Import to ensure browser utilities are loaded and attached to window
 import '@deepnoodle/xray-core'

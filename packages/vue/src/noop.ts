@@ -3,8 +3,8 @@
  * Import this instead of xray-vue in production for zero bundle impact.
  */
 
-import type { App, Plugin } from 'vue'
 import type { XrayCollector } from '@deepnoodle/xray-core'
+import type { App, Plugin } from 'vue'
 
 // Create a no-op collector that satisfies the interface
 const noopCollector: XrayCollector = {
