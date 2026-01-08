@@ -1,6 +1,6 @@
 {
   "name": "@deepnoodle/xray-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Core utilities for xray - give your AI agent eyes into your app's runtime state",
   "type": "module",
   "main": "./dist/index.js",
