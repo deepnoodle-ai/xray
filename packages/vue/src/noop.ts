@@ -4,7 +4,7 @@
  */
 
 import type { App, Plugin } from 'vue'
-import type { XrayCollector } from 'xray-core'
+import type { XrayCollector } from '@deepnoodle/xray-core'
 
 // Create a no-op collector that satisfies the interface
 const noopCollector: XrayCollector = {
@@ -64,6 +64,6 @@ export function useXrayCollector(): XrayCollector {
 }
 
 // Re-export core no-ops
-export * from 'xray-core/noop'
+export * from '@deepnoodle/xray-core/noop'
 
 export default xrayVuePlugin

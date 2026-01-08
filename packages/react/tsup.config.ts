@@ -6,5 +6,5 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ['react', 'xray-core'],
+  external: ['react', '@deepnoodle/xray-core'],
 })

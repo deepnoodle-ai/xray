@@ -4,7 +4,7 @@
  */
 
 import type { ReactElement, ReactNode } from 'react'
-import type { XrayCollector, XrayConfig } from 'xray-core'
+import type { XrayCollector, XrayConfig } from '@deepnoodle/xray-core'
 
 // Create a no-op collector that satisfies the interface
 const noopCollector: XrayCollector = {
@@ -70,4 +70,4 @@ export function useXrayAction(
 }
 
 // Re-export core no-ops
-export * from 'xray-core/noop'
+export * from '@deepnoodle/xray-core/noop'

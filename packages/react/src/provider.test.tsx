@@ -1,6 +1,6 @@
 import { cleanup, render } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { XrayCollector } from 'xray-core'
+import type { XrayCollector } from '@deepnoodle/xray-core'
 import { useXrayCollector, XrayProvider } from './provider.js'
 
 interface XrayWindow {

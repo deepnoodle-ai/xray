@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { XrayCollector } from 'xray-core'
+import type { XrayCollector } from '@deepnoodle/xray-core'
 import { getXrayCollector, initXray, trackStore } from './store.js'
 
 interface XrayWindow {

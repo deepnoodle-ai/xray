@@ -51,19 +51,19 @@ xray is a monorepo that exposes frontend app runtime state via HTTP endpoints fo
 
 ### Package Structure
 
-- **xray-core** (`packages/core/`): Framework-agnostic core with three responsibilities:
+- **@deepnoodle/xray-core** (`packages/core/`): Framework-agnostic core with three responsibilities:
   - **Vite plugin** (`src/vite.ts`): Adds `/xray/*` HTTP endpoints to the dev server and injects client-side polling script
   - **Collector** (`src/collector.ts`): Manages state registry and captures (errors, console, network)
   - **Browser utilities** (`src/browser.ts`): DOM queries, clicks, navigation, screenshots - exposed on `window.__XRAY_BROWSER__`
 
-- **xray-react** (`packages/react/`): React bindings
+- **@deepnoodle/xray-react** (`packages/react/`): React bindings
   - `XrayProvider`: Context provider that initializes collector and sets up interceptors
   - `useXray`: Hook to register component state for inspection
   - `useXrayAction`: Hook to register triggerable actions
 
-- **xray-vue** (`packages/vue/`): Vue bindings with plugin pattern (`xrayVuePlugin`) and composables
+- **@deepnoodle/xray-vue** (`packages/vue/`): Vue bindings with plugin pattern (`xrayVuePlugin`) and composables
 
-- **xray-svelte** (`packages/svelte/`): Svelte bindings with `initXray()` and store tracking
+- **@deepnoodle/xray-svelte** (`packages/svelte/`): Svelte bindings with `initXray()` and store tracking
 
 ### Communication Flow
 

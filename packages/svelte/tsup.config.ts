@@ -6,5 +6,5 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ['svelte', 'svelte/store', 'xray-core'],
+  external: ['svelte', 'svelte/store', '@deepnoodle/xray-core'],
 })

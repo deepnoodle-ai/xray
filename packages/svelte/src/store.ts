@@ -1,5 +1,5 @@
 import type { Readable, Writable } from 'svelte/store'
-import type { XrayCollector, XrayConfig, XrayScope } from 'xray-core'
+import type { XrayCollector, XrayConfig, XrayScope } from '@deepnoodle/xray-core'
 import {
   createCollector,
   createXrayScope,
@@ -10,10 +10,10 @@ import {
   setupInterceptors,
   unregisterAction,
   unregisterFunction,
-} from 'xray-core'
+} from '@deepnoodle/xray-core'
 
 // Import to ensure browser utilities are loaded and attached to window
-import 'xray-core'
+import '@deepnoodle/xray-core'
 
 let cleanup: (() => void) | null = null
 let collector: XrayCollector | null = null

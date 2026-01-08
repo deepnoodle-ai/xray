@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import type { XrayScope } from 'xray-core'
+import type { XrayScope } from '@deepnoodle/xray-core'
 import {
   createXrayScope,
   getCollector,
@@ -8,7 +8,7 @@ import {
   safeSerialize,
   unregisterAction,
   unregisterFunction,
-} from 'xray-core'
+} from '@deepnoodle/xray-core'
 
 /**
  * Register state with react-xray for inspection.

@@ -3,7 +3,7 @@
  * Import this instead of xray-svelte in production for zero bundle impact.
  */
 
-import type { XrayCollector } from 'xray-core'
+import type { XrayCollector } from '@deepnoodle/xray-core'
 
 // Svelte-specific no-ops
 export interface XrayOptions {
@@ -48,4 +48,4 @@ export function getXrayCollector(): XrayCollector | null {
 }
 
 // Re-export core no-ops
-export * from 'xray-core/noop'
+export * from '@deepnoodle/xray-core/noop'

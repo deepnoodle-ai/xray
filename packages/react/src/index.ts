@@ -17,7 +17,7 @@ export type {
   XrayFunction,
   XrayScope,
   XrayState,
-} from 'xray-core'
+} from '@deepnoodle/xray-core'
 // Re-export core types and utilities for convenience
 export {
   captureScreenshot,
@@ -47,7 +47,7 @@ export {
   setupInterceptors,
   unregisterAction,
   unregisterFunction,
-} from 'xray-core'
+} from '@deepnoodle/xray-core'
 export {
   useXray,
   useXrayAction,

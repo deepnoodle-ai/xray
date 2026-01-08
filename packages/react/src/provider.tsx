@@ -5,11 +5,11 @@ import React, {
   useEffect,
   useRef,
 } from 'react'
-import type { XrayCollector, XrayConfig } from 'xray-core'
-import { createCollector, setCollector, setupInterceptors } from 'xray-core'
+import type { XrayCollector, XrayConfig } from '@deepnoodle/xray-core'
+import { createCollector, setCollector, setupInterceptors } from '@deepnoodle/xray-core'
 
 // Import to ensure browser utilities are loaded and attached to window
-import 'xray-core'
+import '@deepnoodle/xray-core'
 
 interface XrayContextValue {
   collector: XrayCollector

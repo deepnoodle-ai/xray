@@ -1,5 +1,5 @@
 import { inject, onUnmounted, type Ref, type WatchSource, watch } from 'vue'
-import type { XrayCollector, XrayScope } from 'xray-core'
+import type { XrayCollector, XrayScope } from '@deepnoodle/xray-core'
 import {
   createXrayScope,
   getCollector,
@@ -7,7 +7,7 @@ import {
   registerFunction,
   unregisterAction,
   unregisterFunction,
-} from 'xray-core'
+} from '@deepnoodle/xray-core'
 
 /**
  * Register reactive state with xray for inspection.

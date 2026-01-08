@@ -4,12 +4,12 @@ Give your AI agent eyes into your app's runtime state. Works with **React**, **V
 
 ## Packages
 
-| Package                            | Description                    |
-| ---------------------------------- | ------------------------------ |
-| [`xray-core`](./packages/core)     | Core utilities and Vite plugin |
-| [`xray-react`](./packages/react)   | React bindings                 |
-| [`xray-vue`](./packages/vue)       | Vue bindings                   |
-| [`xray-svelte`](./packages/svelte) | Svelte bindings                |
+| Package                                              | Description                    |
+| ---------------------------------------------------- | ------------------------------ |
+| [`@deepnoodle/xray-core`](./packages/core)           | Core utilities and Vite plugin |
+| [`@deepnoodle/xray-react`](./packages/react)         | React bindings                 |
+| [`@deepnoodle/xray-vue`](./packages/vue)             | Vue bindings                   |
+| [`@deepnoodle/xray-svelte`](./packages/svelte)       | Svelte bindings                |
 
 ## The Problem
 
@@ -39,20 +39,20 @@ curl "localhost:5173/xray/navigate?url=/dashboard"
 
 ```bash
 # React
-npm install xray-react xray-core
+npm install @deepnoodle/xray-react @deepnoodle/xray-core
 
 # Vue
-npm install xray-vue xray-core
+npm install @deepnoodle/xray-vue @deepnoodle/xray-core
 
 # Svelte
-npm install xray-svelte xray-core
+npm install @deepnoodle/xray-svelte @deepnoodle/xray-core
 ```
 
 ### Add the Vite Plugin (all frameworks)
 
 ```ts
 // vite.config.ts
-import { xrayPlugin } from "xray-core/vite";
+import { xrayPlugin } from "@deepnoodle/xray-core/vite";
 
 export default {
   plugins: [, /* your framework plugin */ xrayPlugin()],
@@ -65,7 +65,7 @@ export default {
 
 ```tsx
 // main.tsx
-import { XrayProvider } from "xray-react";
+import { XrayProvider } from "@deepnoodle/xray-react";
 
 function App() {
   return (
@@ -79,7 +79,7 @@ function App() {
 ### Register Component State
 
 ```tsx
-import { useXray, useXrayAction } from "xray-react";
+import { useXray, useXrayAction } from "@deepnoodle/xray-react";
 
 function Dashboard() {
   const [filter, setFilter] = useState("all");
@@ -102,7 +102,7 @@ function Dashboard() {
 ```ts
 // main.ts
 import { createApp } from "vue";
-import { xrayVuePlugin } from "xray-vue";
+import { xrayVuePlugin } from "@deepnoodle/xray-vue";
 import App from "./App.vue";
 
 const app = createApp(App);
@@ -115,7 +115,7 @@ app.mount("#app");
 ```vue
 <script setup>
 import { ref, reactive } from "vue";
-import { useXray, useXrayAction } from "xray-vue";
+import { useXray, useXrayAction } from "@deepnoodle/xray-vue";
 
 const filter = ref("all");
 const data = reactive({ items: [], loading: false });
@@ -138,7 +138,7 @@ useXrayAction("refreshData", () => fetchData(), "Refresh dashboard data");
 ```svelte
 <!-- +layout.svelte -->
 <script>
-  import { initXray } from "xray-svelte";
+  import { initXray } from "@deepnoodle/xray-svelte";
   import { onDestroy } from "svelte";
 
   const cleanup = initXray();
@@ -153,7 +153,7 @@ useXrayAction("refreshData", () => fetchData(), "Refresh dashboard data");
 ```svelte
 <script>
   import { writable } from "svelte/store";
-  import { trackStore, registerXrayAction } from "xray-svelte";
+  import { trackStore, registerXrayAction } from "@deepnoodle/xray-svelte";
   import { onDestroy } from "svelte";
 
   const filter = writable("all");
@@ -245,7 +245,7 @@ Register custom functions that agents can call remotely. Unlike actions (for tri
 ### React
 
 ```tsx
-import { useXrayFunction, useXrayScope } from "xray-react";
+import { useXrayFunction, useXrayScope } from "@deepnoodle/xray-react";
 
 function GameCanvas({ canvasId }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -275,7 +275,7 @@ function GameCanvas({ canvasId }) {
 ```vue
 <script setup>
 import { ref } from "vue";
-import { useXrayFunction, useXrayScope } from "xray-vue";
+import { useXrayFunction, useXrayScope } from "@deepnoodle/xray-vue";
 
 const props = defineProps<{ canvasId: string }>();
 const canvasRef = ref<HTMLCanvasElement>();
@@ -295,7 +295,7 @@ xray.registerFunction("capture", () => canvasRef.value?.toDataURL());
 
 ```svelte
 <script>
-  import { registerXrayFunction, createXrayScopeWithCleanup } from "xray-svelte";
+  import { registerXrayFunction, createXrayScopeWithCleanup } from "@deepnoodle/xray-svelte";
   import { onDestroy } from "svelte";
 
   export let canvasId;
@@ -366,9 +366,9 @@ export default defineConfig({
   resolve: {
     alias: import.meta.env.PROD
       ? {
-          "xray-react": "xray-react/noop",
-          "xray-vue": "xray-vue/noop",
-          "xray-svelte": "xray-svelte/noop",
+          "@deepnoodle/xray-react": "@deepnoodle/xray-react/noop",
+          "@deepnoodle/xray-vue": "@deepnoodle/xray-vue/noop",
+          "@deepnoodle/xray-svelte": "@deepnoodle/xray-svelte/noop",
         }
       : {},
   },
@@ -385,7 +385,7 @@ Protect your xray endpoints with a shared secret:
 
 ```ts
 // vite.config.ts
-import { xrayPlugin } from "xray-core/vite";
+import { xrayPlugin } from "@deepnoodle/xray-core/vite";
 
 export default {
   plugins: [
@@ -416,36 +416,24 @@ curl "localhost:5173/xray/state?secret=your-secret"
 ## Development
 
 ```bash
-# Install dependencies
-npm install
+make help         # Show all available commands
+make install      # Install dependencies
+make build        # Build all packages
+make test         # Run tests
+make lint         # Lint all packages
+make typecheck    # Type check all packages
+```
 
-# Build all packages
-npm run build
+Or use npm directly:
 
-# Build specific package
-npm run build -w packages/core
-
-# Lint all packages
-npm run lint
-
-# Lint and fix issues
-npm run lint:fix
-
-# Format code
-npm run format
-
-# Run tests
-npm run test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with coverage
-npm run test:coverage
+```bash
+npm run build -w packages/core   # Build specific package
+npm run test:watch               # Run tests in watch mode
+npm run test:coverage            # Run tests with coverage
 ```
 
 ---
 
 ## License
 
-MIT
+Apache-2.0

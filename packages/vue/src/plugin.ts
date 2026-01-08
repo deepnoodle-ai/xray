@@ -1,9 +1,9 @@
 import type { App, Plugin } from 'vue'
-import type { XrayCollector, XrayConfig } from 'xray-core'
-import { createCollector, setCollector, setupInterceptors } from 'xray-core'
+import type { XrayCollector, XrayConfig } from '@deepnoodle/xray-core'
+import { createCollector, setCollector, setupInterceptors } from '@deepnoodle/xray-core'
 
 // Import to ensure browser utilities are loaded and attached to window
-import 'xray-core'
+import '@deepnoodle/xray-core'
 
 export interface XrayPluginOptions extends XrayConfig {
   /** Enable the inspector (default: true) */
