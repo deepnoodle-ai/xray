@@ -54,7 +54,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/deepnoodle-ai/xray",
+    "url": "git+https://github.com/deepnoodle-ai/xray.git",
     "directory": "packages/core"
   }
 }
