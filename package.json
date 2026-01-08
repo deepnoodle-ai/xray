@@ -1,5 +1,5 @@
 {
-  "name": "xray-monorepo",
+  "name": "deepnoodle/xray-monorepo",
   "private": true,
   "workspaces": [
     "packages/*"

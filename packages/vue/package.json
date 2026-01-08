@@ -1,5 +1,5 @@
 {
-  "name": "xray-vue",
+  "name": "deepnoodle/xray-vue",
   "version": "0.1.0",
   "description": "Vue bindings for xray - give your AI agent eyes into your Vue app's runtime state",
   "type": "module",

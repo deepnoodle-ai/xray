@@ -1,5 +1,5 @@
 {
-  "name": "xray-react",
+  "name": "deepnoodle/xray-react",
   "version": "0.1.0",
   "description": "React bindings for xray - give your AI agent eyes into your React app's runtime state",
   "type": "module",
